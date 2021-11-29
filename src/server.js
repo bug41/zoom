@@ -1,5 +1,6 @@
 import http from "http";
-import WebSocket from "ws";
+import SocketIO from "socket.io"
+//import WebSocket from "ws";
 import express from "express";
 
 const app = express();
@@ -10,13 +11,25 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req,res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"))
 
-const handleListen = () => console.log(`Listening on http://localhost:3001`)
+const handleListen = () => console.log(`Listening on http://localhost:3000`)
 
-const server = http.createServer(app)
-const wss = new WebSocket.Server({server})
+const httpServer = http.createServer(app)
+const wsServer = SocketIO(httpServer);
+//const wss = new WebSocket.Server({server})
 
+wsServer.on("connection", socket => {    
+    socket.on("enter_room", (roomName, done) => {
+        console.log(roomName);
+
+        setTimeout(() => {
+            done("hello from backend zzz");
+        }, 2000);
+        
+    })
+})
+
+/*
 const sockets = [];
-
 wss.on("connection", (socket) => {
     sockets.push(socket);
     socket["nickname"] = "Anon";
@@ -37,7 +50,6 @@ wss.on("connection", (socket) => {
         //console.log(message, Buffer.from(message, "base64").toString("utf-8"));                
     });
 });
-
-server.listen(3001, handleListen);
-
+*/
+httpServer.listen(3000, handleListen);
 //app.listen(3000)
